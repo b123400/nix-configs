@@ -76,7 +76,6 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-  services.nginx.enable = true;
   services.nscd.enable = false;
 
   services.openvpn = {

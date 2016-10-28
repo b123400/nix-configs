@@ -1,4 +1,7 @@
 let
+
+  secrets = (import ./secrets.nix);
+
   wellKnown = ''
     location ^~ /.well-known/acme-challenge/ {
       default_type "text/plain";
@@ -10,16 +13,48 @@ let
     }
   '';
 
-  secrets = (import ./secrets.nix);
+  proxyServer = {
+    domain,
+    internalPort,
+    sslEnabled ? false
+    }: ''
+    server {
+      listen 80;
+      listen 443 ssl;
+      server_name ${domain};
+
+      ${
+        if sslEnabled then ''
+          ${wellKnown}
+          ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;
+          ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;
+        '' else ""
+      }
+
+
+      location / {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass http://127.0.0.1:${internalPort}/;
+        proxy_redirect off;
+      }
+    }
+  '';
 
 in
 {
   networking.firewall.allowedTCPPorts = [ 80 443 ];
+  services.nginx.enable = true;
+
   services.nginx.httpConfig=''
     server {
       listen       80;
       listen       443 ssl;
-      server_name  b123400.net www.b123400.net;
+      server_name  b123400.net;
 
       ${wellKnown}
       ssl_certificate /etc/letsencrypt/live/b123400.net/fullchain.pem;
@@ -33,65 +68,28 @@ in
       }
     }
 
-    server {
-      listen 80;
-      listen 443 ssl;
-      server_name  blog.b123400.net;
-
-      ${wellKnown}
-      ssl_certificate /etc/letsencrypt/live/blog.b123400.net/fullchain.pem;
-      ssl_certificate_key /etc/letsencrypt/live/blog.b123400.net/privkey.pem;
-
-      location / {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-NginX-Proxy true;
-        proxy_set_header X-Forwarded-Proto $scheme;
-
-        proxy_pass http://127.0.0.1:${secrets.blog.port}/;
-        proxy_redirect off;
+    ${
+      proxyServer {
+        domain = "blog.b123400.net";
+        internalPort = secrets.blog.port;
+        sslEnabled = true;
       }
     }
 
-    server {
-        listen 80;
-        listen 443 ssl;
-        server_name danmaku.b123400.net;
-
-        ${wellKnown}
-        ssl_certificate /etc/letsencrypt/live/danmaku.b123400.net/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/danmaku.b123400.net/privkey.pem;
-
-        location / {
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-NginX-Proxy true;
-
-            proxy_pass http://127.0.0.1:${secrets.danmaku.port}/;
-            proxy_redirect off;
-        }
+    ${
+      proxyServer {
+        domain = "danmaku.b123400.net";
+        internalPort = secrets.danmaku.port;
+        sslEnabled = true;
+      }
     }
 
-    server {
-        listen 80;
-        listen 443 ssl;
-        server_name whosetweet.b123400.net;
-
-        ${wellKnown}
-        ssl_certificate /etc/letsencrypt/live/whosetweet.b123400.net/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/whosetweet.b123400.net/privkey.pem;
-
-        location / {
-             proxy_set_header X-Real-IP $remote_addr;
-             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-             proxy_set_header Host $http_host;
-             proxy_set_header X-NginX-Proxy true;
-
-             proxy_pass http://127.0.0.1:${secrets.whosetweet.port}/;
-             proxy_redirect off;
-        }
+    ${
+      proxyServer {
+        domain = "whosetweet.b123400.net";
+        internalPort = secrets.whosetweet.port;
+        sslEnabled = true;
+      }
     }
 
     server {
