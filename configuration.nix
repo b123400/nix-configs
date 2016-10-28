@@ -47,9 +47,9 @@
     extraStopCommands = ''
       iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
     '';
-    allowedUDPPorts = [ 1194 1195 ];
+    allowedUDPPorts = [ 1194 ];
     allowedTCPPorts = [ 9091 ];
-    trustedInterfaces = [ "tun0" "tun1" ];
+    trustedInterfaces = [ "tun0" ];
   };
 
   # Select internationalisation properties.
@@ -89,19 +89,9 @@
           comp-lzo
         '';
       };
-       for-bk201 = {
-        config = ''
-          dev tun1
-          ifconfig 10.8.0.1 10.8.0.3
-          secret /root/openvpn-certs/bk201.key
-          port 1195
-          comp-lzo
-        '';
-      };
     };
   };
   systemd.services."openvpn-for-yoite".serviceConfig.TimeoutStartSec = "6min";
-  systemd.services."openvpn-for-bk201".serviceConfig.TimeoutStartSec = "6min";
 
   services.mysql = {
     enable = true;
