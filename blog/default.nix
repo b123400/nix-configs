@@ -23,7 +23,7 @@ let
     (with rec {
       # fetchzip2 = import ./fetchzip2.nix { inherit pkgs; };
       zipfile = (pkgs.fetchzip {
-        url = "https://ghost.org/zip/ghost-0.11.2.zip";
+        url = "https://github.com/TryGhost/Ghost/releases/download/0.11.2/Ghost-0.11.2.zip";
         sha1 = "5wdibxzgq7n2y9kzs0s02y7b13zcy9mv";
         stripRoot = false;
       });
