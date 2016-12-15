@@ -3,7 +3,7 @@ let
   stdenv = pkgs.stdenv;
   fetchurl = pkgs.fetchurl;
   unzip = pkgs.unzip;
-  nodejs = pkgs.nodejs-5_x;
+  nodejs = pkgs.nodejs;
   elixir = pkgs.elixir;
   mysql = pkgs.mysql57;
   makeWrapper = pkgs.makeWrapper;

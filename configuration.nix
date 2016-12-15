@@ -14,23 +14,15 @@
       ./nginx.nix
     ];
 
-  boot.loader.grub = {
-    enable = true;
-    version = 1;
-    extraPerEntryConfig = "root (hd0)";
-    device = "nodev";
-  };
+  # Use the GRUB 2 boot loader.
+  boot.loader.grub.enable = true;
+  boot.loader.grub.version = 2;
+  # Define on which hard drive you want to install Grub.
+  boot.loader.grub.device = "/dev/sda";
+  boot.cleanTmpDir = true;
 
-  # These does not work for xen?
-  # # Use the GRUB 2 boot loader.
-  # boot.loader.grub.enable = true;
-  # boot.loader.grub.version = 2;
-  # # Define on which hard drive you want to install Grub.
-  # boot.loader.grub.device = "/dev/sda";
-  # boot.cleanTmpDir = true;
-
-  # boot.kernelParams = [ "console=ttyS0" ];
-  # boot.loader.grub.extraConfig = "serial; terminal_input serial; terminal_output serial";
+  boot.kernelParams = [ "console=ttyS0" ];
+  boot.loader.grub.extraConfig = "serial; terminal_input serial; terminal_output serial";
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
@@ -76,17 +68,27 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  services.nginx.enable = true;
   services.nscd.enable = false;
 
   services.openvpn = {
     servers = {
-      for-yoite = {
+      nadeko = {
         config = ''
           dev tun0
-          ifconfig 10.8.0.1 10.8.0.2
-          secret /root/openvpn-certs/static.key
+          # ifconfig 10.8.0.1 10.8.0.2
           port 1194
           comp-lzo
+          server 10.8.0.0 255.255.255.0
+
+          ca /root/openvpn/pki/ca.crt
+          cert /root/openvpn/pki/issued/Hanekawa.crt
+          key /root/openvpn/pki/private/Hanekawa.key
+          tls-auth /root/openvpn/ta.key
+          dh /root/openvpn/pki/dh.pem
+
+          push "redirect-gateway def1"
+          push "dhcp-option DNS 8.8.8.8"
         '';
       };
     };
@@ -97,8 +99,8 @@
     enable = true;
     package = pkgs.mysql;
     extraOptions = ''
-      character-set-server = utf8
-      collation-server = utf8_unicode_ci
+      character-set-server    = utf8
+      collation-server        = utf8_unicode_ci
     '';
   };
 
@@ -135,5 +137,4 @@
 
   # The NixOS release to be compatible with for stateful data such as databases.
   system.stateVersion = "16.09";
-
 }
