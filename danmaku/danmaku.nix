@@ -102,7 +102,7 @@ wrapProgram $out/bin/migrate_and_start.sh \
 
   src = fetchurl {
     url = https://github.com/b123400/danmaku/archive/2085d27aefe985ce3fc5e7baa35766aa056ff4e6.zip;
-    md5 = "746e22a0b74df88779c1afada0411277";
+    sha256 = "1y8c7yfnmgycngbijq9sc9d4613zjxsbh7gg0456cq2niwydg3rp";
   };
 }
 

@@ -23,6 +23,7 @@ haskell.lib.buildStackProject {
     export HOME=$NIX_BUILD_TOP/fake-home
     mkdir -p fake-home
     export STACK_ROOT=$NIX_BUILD_TOP/.stack
+    stack config set system-ghc --global true
   '';
 
   installPhase = ''
