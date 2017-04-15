@@ -6,8 +6,10 @@ let
 
   secrets = (import ../secrets.nix).blog;
 
-  blog = import ./default.nix {
-    pkgs = import <nixpkgs> {};
+  blog = import ./configurable.nix {
+    inherit stdenv nodejs;
+    inherit (pkgs) fetchzip utillinux runCommand;
+
     port = secrets.port;
     url = secrets.url;
     host = "127.0.0.1";

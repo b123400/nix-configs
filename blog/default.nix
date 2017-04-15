@@ -1,19 +1,15 @@
-{ pkgs,
-  port ? "2368",
-  url,
-  host ? "127.0.0.1",
-  contentPath,
-  mysqlHost ? "127.0.0.1",
-  mysqlUser,
-  mysqlPassword,
-  mysqlDatabase,
-  mysqlCharset ? "utf8" }:
+{ stdenv
+, nodejs
+, fetchzip
+, utillinux
+, runCommand
+, ... } @ args:
 
 let
+  pkgs = import <nixpkgs> {};
   nodePackages = import "${pkgs.path}/pkgs/top-level/node-packages.nix" {
-    inherit pkgs;
-    inherit (pkgs) stdenv nodejs fetchurl fetchgit;
-    neededNatives = pkgs.lib.optional pkgs.stdenv.isLinux pkgs.utillinux;
+    inherit stdenv nodejs;
+    neededNatives = stdenv.lib.optional stdenv.isLinux utillinux;
     self = nodePackages;
     generated = ./node-packages.nix;
   };
@@ -21,65 +17,27 @@ let
   # It seems buildNodePackage doesn't like it any other way.
   src = [
     (with rec {
-      # fetchzip2 = import ./fetchzip2.nix { inherit pkgs; };
-      zipfile = (pkgs.fetchzip {
+      zipfile = (fetchzip {
         url = "https://github.com/TryGhost/Ghost/releases/download/0.11.7/Ghost-0.11.7.zip";
         sha1 = "dys1g4kv12qrfr2g8cl75sy4x4ychgcz";
         stripRoot = false;
       });
-    }; pkgs.runCommand "ghost-0.11.7.tgz" { buildInputs = [ pkgs.nodejs ]; } ''
+    }; runCommand "ghost-0.11.7.tgz" { buildInputs = [ nodejs ]; } ''
          mv `HOME=$PWD npm pack ${zipfile}` $out
        '')
   ];
 in
-nodePackages.buildNodePackage {
+nodePackages.buildNodePackage ({
   name = "ghost-0.11.7";
   inherit src;
-  buildInputs = [ ];
-  patchPhase = ''
-    pwd
-    ls -lah
-    substituteInPlace package.json --replace 'npm install semver && '
 
-    # Somehow Knex wants mysql to be inside package.json
+  patchPhase = ''
+    # Somehow Knex wants mysql and pg to be inside package.json
+    # remove them from optional dependencies, move them to dependencies
     substituteInPlace package.json --replace '"mysql": "2.1.1",'
     substituteInPlace package.json --replace '"pg": "6.1.2"'
     substituteInPlace package.json --replace '"xml": "1.0.1"' '"xml": "1.0.1","mysql": "2.1.1","pg": "6.1.2"'
-
-    echo $ghostConfig > config.js
   '';
-
-  ghostConfig = ''
-    var path = require('path'),
-      config;
-
-    config = {
-      production: {
-        url: '${url}',
-        mail: {},
-        database: {
-          client: 'mysql',
-          connection: {
-            host     : '${mysqlHost}',
-            user     : '${mysqlUser}',
-            password : '${mysqlPassword}',
-            database : '${mysqlDatabase}',
-            charset  : '${mysqlCharset}'
-          },
-          debug: false
-        },
-        server: {
-          host: '${host}',
-          port: '${port}'
-        },
-        paths: {
-          contentPath: '${contentPath}',
-        },
-      },
-    };
-    module.exports = config;
-  '';
-
 
   deps = [
     nodePackages.by-spec."amperize"."0.3.4"
@@ -135,4 +93,4 @@ nodePackages.buildNodePackage {
     nodePackages.by-spec."pg"."6.1.2"
   ];
   peerDependencies = [];
-}
+} // (stdenv.lib.filterAttrs (n: v: stdenv.lib.all (k: n != k) ["stdenv" "nodejs" "fetchzip" "utillinux" "runCommand"]) args))
