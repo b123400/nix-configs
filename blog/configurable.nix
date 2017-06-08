@@ -4,18 +4,29 @@
 , utillinux
 , runCommand
 
+# Configuration
 ,  port ? "2368"
 ,  url
 ,  host ? "127.0.0.1"
 ,  contentPath
+,  databaseClient ? "mysql"
+
+# For mysql
 ,  mysqlHost ? "127.0.0.1"
-,  mysqlUser
-,  mysqlPassword
-,  mysqlDatabase
-,  mysqlCharset ? "utf8" }:
+,  mysqlUser ? "root"
+,  mysqlPassword ? ""
+,  mysqlDatabase ? "ghost"
+,  mysqlCharset ? "utf8"
+
+# For sqlite
+,  sqliteFilename ? "" }:
 
 let
   ghost = import ./default.nix;
+  client =
+    if stdenv.lib.any (c: c == databaseClient) ["mysql" "sqlite3"]
+    then databaseClient
+    else throw "databaseClient has to be either mysql or sqlite3";
 in
   ghost {
     inherit stdenv nodejs fetchzip utillinux runCommand;
@@ -30,13 +41,14 @@ in
           url: '${url}',
           mail: {},
           database: {
-            client: 'mysql',
+            client: '${client}',
             connection: {
               host     : '${mysqlHost}',
               user     : '${mysqlUser}',
               password : '${mysqlPassword}',
               database : '${mysqlDatabase}',
-              charset  : '${mysqlCharset}'
+              charset  : '${mysqlCharset}',
+              filename : '${sqliteFilename}'
             },
             debug: false
           },
