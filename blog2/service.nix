@@ -30,6 +30,10 @@ in {
     };
     serviceConfig = {
       Type = "simple";
+      WorkingDirectory = "${blog}/lib/node_modules/ghost";
+      ExecStartPre = ''
+        ${blog}/lib/node_modules/ghost/node_modules/knex-migrator/bin/knex-migrator init
+      '';
       ExecStart = ''
         ${nodejs}/bin/node ${blog}/lib/node_modules/ghost/index.js
       '';
