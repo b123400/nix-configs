@@ -70,14 +70,6 @@ in
 
     ${
       proxyServer {
-        domain = "blog.b123400.net";
-        internalPort = secrets.blog.port;
-        sslEnabled = true;
-      }
-    }
-
-    ${
-      proxyServer {
         domain = "danmaku.b123400.net";
         internalPort = secrets.danmaku.port;
         sslEnabled = true;
@@ -88,6 +80,14 @@ in
       proxyServer {
         domain = "whosetweet.b123400.net";
         internalPort = secrets.whosetweet.port;
+        sslEnabled = true;
+      }
+    }
+
+    ${
+      proxyServer {
+        domain = "blog.b123400.net";
+        internalPort = secrets.blog2.port;
         sslEnabled = true;
       }
     }
