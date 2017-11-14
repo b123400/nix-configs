@@ -8,7 +8,6 @@
   imports =
     [ ./hardware-configuration.nix
       ./b123400.nix
-      ./danmaku/service.nix
       ./whosetweet/service.nix
       # ./blog/service.nix
       ./blog2/service.nix
