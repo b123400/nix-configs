@@ -7,3 +7,4 @@ vim_configurable.customize {
       set backspace=indent,eol,start
     '';
 }
+

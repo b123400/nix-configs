@@ -1,25 +1,16 @@
 let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
-  nodejs = pkgs.nodejs-4_x;
+  nodejs = pkgs.nodejs-6_x;
   mysql = pkgs.mysql57;
 
   secrets = (import ../secrets.nix).blog;
 
-  blog = import ./configurable.nix {
-    inherit stdenv nodejs;
-    inherit (pkgs) fetchzip utillinux runCommand;
-
-    port = secrets.port;
-    url = secrets.url;
-    host = "127.0.0.1";
-    contentPath = secrets.contentPath;
-    mysqlHost = secrets.mysqlHost;
-    mysqlUser = secrets.mysqlUser;
-    mysqlPassword = secrets.mysqlPassword;
-    mysqlDatabase = secrets.mysqlDatabase;
-    mysqlCharset = "utf8";
-  };
+  blog = (import ./default.nix {}).package;
+  # {
+  #   inherit stdenv nodejs;
+  #   inherit (pkgs) fetchzip utillinux runCommand;
+  # };
 in {
 
   systemd.services.ghost = {
@@ -27,9 +18,23 @@ in {
     after = [ "mysql.service" ];
     environment = {
       NODE_ENV="production";
+      url=secrets.url;
+      database__client="mysql";
+      database__connection__host=secrets.mysqlHost;
+      database__connection__user=secrets.mysqlUser;
+      database__connection__password=secrets.mysqlPassword;
+      database__connection__database=secrets.mysqlDatabase;
+      database__connection__charset="utf8";
+      server__host="127.0.0.1";
+      server__port=secrets.port;
+      paths__contentPath=secrets.contentPath;
     };
     serviceConfig = {
       Type = "simple";
+      WorkingDirectory = "${blog}/lib/node_modules/ghost";
+      ExecStartPre = ''
+        ${blog}/lib/node_modules/ghost/node_modules/knex-migrator/bin/knex-migrator init
+      '';
       ExecStart = ''
         ${nodejs}/bin/node ${blog}/lib/node_modules/ghost/index.js
       '';
