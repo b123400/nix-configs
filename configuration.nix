@@ -16,16 +16,23 @@
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
+  # boot.loader.grub.efiSupport = true;
+  # boot.loader.grub.efiInstallAsRemovable = true;
+  # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
-  boot.loader.grub.device = "/dev/sda";
+  # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+
+  boot.loader.grub.forceInstall = true;
+  boot.loader.grub.device = "nodev";
+  boot.loader.timeout = 10;
   boot.cleanTmpDir = true;
 
-  boot.kernelParams = [ "console=ttyS0" ];
-  boot.loader.grub.extraConfig = "serial; terminal_input serial; terminal_output serial";
-
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-  };
+  boot.kernelParams = ["console=ttyS0,19200n8"];
+  boot.loader.grub.extraConfig = ''
+    serial --speed=19200 --unit=0 --word=8 --parity=no --stop=1;
+    terminal_input serial;
+    terminal_output serial
+  '';
 
   networking.hostName = "Hanekawa"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -40,20 +47,36 @@
   # Set your time zone.
   # time.timeZone = "Europe/Amsterdam";
 
-
-
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP | grep wget
   environment.systemPackages = with pkgs; [
-  #   wget
-    (import ./vim.nix)
+    wget vim
+    inetutils
+    mtr
+    sysstat
     certbot
+    (import ./vim.nix)
   ];
+
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.bash.enableCompletion = true;
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
 
   # List services that you want to enable:
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    permitRootLogin = "no";
+  };
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
   networking.firewall = {
     enable = true;
     extraCommands = ''
@@ -66,8 +89,9 @@
     allowedTCPPorts = [ 9091 ];
     trustedInterfaces = [ "tun0" ];
   };
+
   services.nginx.enable = true;
-  services.nscd.enable = false;
+  services.nginx.statusPage = true;
 
   services.openvpn = {
     servers = {
@@ -91,10 +115,10 @@
       };
     };
   };
-  systemd.services."openvpn-for-yoite".serviceConfig.TimeoutStartSec = "6min";
 
-  services.mysql = {
   networking.usePredictableInterfaceNames = false;
+
+    services.mysql = {
     enable = true;
     package = pkgs.mysql;
     extraOptions = ''
@@ -124,9 +148,12 @@
   # services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e";
 
+  # Enable touchpad support.
+  # services.xserver.libinput.enable = true;
+
   # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.kdm.enable = true;
-  # services.xserver.desktopManager.kde4.enable = true;
+  # services.xserver.displayManager.sddm.enable = true;
+  # services.xserver.desktopManager.plasma5.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # users.extraUsers.guest = {
@@ -134,6 +161,10 @@
   #   uid = 1000;
   # };
 
-  # The NixOS release to be compatible with for stateful data such as databases.
-  system.stateVersion = "17.03";
+  # This value determines the NixOS release with which your system is to be
+  # compatible, in order to avoid breaking some software such as database
+  # servers. You should change this only after NixOS release notes say you
+  # should.
+  system.stateVersion = "17.09"; # Did you read the comment?
+
 }
