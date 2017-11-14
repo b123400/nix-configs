@@ -140,6 +140,16 @@
       };
     };
 
+  services.longview = {
+    enable = true;
+    apiKey = (import ./secrets.nix).longview.apiKey;
+    # TODO: use apiKeyFile
+
+    nginxStatusUrl = "http://localhost/nginx_status";
+    # mysqlUser = "";
+    # mysqlPassword = "";
+  };
+
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
