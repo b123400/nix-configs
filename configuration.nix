@@ -30,19 +30,6 @@
   networking.hostName = "Hanekawa"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
-  networking.firewall = {
-    enable = true;
-    extraCommands = ''
-      iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
-    '';
-    extraStopCommands = ''
-      iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
-    '';
-    allowedUDPPorts = [ 1194 ];
-    allowedTCPPorts = [ 9091 ];
-    trustedInterfaces = [ "tun0" ];
-  };
-
   # Select internationalisation properties.
   # i18n = {
   #   consoleFont = "Lat2-Terminus16";
@@ -67,6 +54,18 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  networking.firewall = {
+    enable = true;
+    extraCommands = ''
+      iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+    '';
+    extraStopCommands = ''
+      iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+    '';
+    allowedUDPPorts = [ 1194 ];
+    allowedTCPPorts = [ 9091 ];
+    trustedInterfaces = [ "tun0" ];
+  };
   services.nginx.enable = true;
   services.nscd.enable = false;
 
@@ -95,6 +94,7 @@
   systemd.services."openvpn-for-yoite".serviceConfig.TimeoutStartSec = "6min";
 
   services.mysql = {
+  networking.usePredictableInterfaceNames = false;
     enable = true;
     package = pkgs.mysql;
     extraOptions = ''
