@@ -115,10 +115,13 @@
       };
     };
   };
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+  };
 
   networking.usePredictableInterfaceNames = false;
 
-    services.mysql = {
+  services.mysql = {
     enable = true;
     package = pkgs.mysql;
     extraOptions = ''
