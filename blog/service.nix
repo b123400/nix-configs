@@ -1,7 +1,7 @@
 let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
-  nodejs = pkgs.nodejs-6_x;
+  nodejs = pkgs.nodejs-8_x;
   mysql = pkgs.mysql57;
 
   secrets = (import ../secrets.nix).blog;
@@ -24,7 +24,7 @@ in {
       database__connection__user=secrets.mysqlUser;
       database__connection__password=secrets.mysqlPassword;
       database__connection__database=secrets.mysqlDatabase;
-      database__connection__charset="utf8";
+      database__connection__charset="utf8mb4";
       server__host="127.0.0.1";
       server__port=secrets.port;
       paths__contentPath=secrets.contentPath;

@@ -125,8 +125,8 @@
     enable = true;
     package = pkgs.mysql;
     extraOptions = ''
-      character-set-server    = utf8
-      collation-server        = utf8_unicode_ci
+      character-set-server    = utf8mb4
+      collation-server        = utf8mb4_general_ci
     '';
   };
 
