@@ -6,11 +6,15 @@
 
 {
   imports =
-    [ ./hardware-configuration.nix
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
       ./b123400.nix
       ./nginx.nix
       ./blog/service.nix
       ./whosetweet/service.nix
+      ./krrForm/service.nix
+      ./todograph/service.nix
+      ./ferry-web/service.nix
     ];
 
   # Use the GRUB 2 boot loader.
@@ -90,6 +94,19 @@
     trustedInterfaces = [ "tun0" ];
   };
 
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+  };
+
+  networking.interfaces= {
+    eth0 = {
+      tempAddress = "disabled";
+    };
+    tun0 = {
+      tempAddress = "disabled";
+    };
+  };
+
   services.nginx.enable = true;
   services.nginx.statusPage = true;
 
@@ -115,11 +132,15 @@
       };
     };
   };
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_forward" = 1;
-  };
 
-  networking.usePredictableInterfaceNames = false;
+  #networking.nat = {
+  #  enable = true;
+  #  externalInterface = "eth0";
+  #  internalInterfaces = [ "wg0" ];
+  #};
+
+  #networking.usePredictableInterfaceNames = false;
+  networking.enableIPv6 = true;
 
   services.mysql = {
     enable = true;
@@ -128,6 +149,12 @@
       character-set-server    = utf8mb4
       collation-server        = utf8mb4_general_ci
     '';
+  };
+
+  services.neo4j = {
+    enable = true;
+    shell.enable = true;
+    bolt.enable = true;
   };
 
   services.transmission =
@@ -152,6 +179,7 @@
     # mysqlUser = "";
     # mysqlPassword = "";
   };
+  services.logind.extraConfig = "RuntimeDirectorySize=1024M";
 
   # Enable CUPS to print documents.
   # services.printing.enable = true;

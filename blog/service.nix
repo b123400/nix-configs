@@ -1,7 +1,7 @@
 let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
-  nodejs = pkgs.nodejs-8_x;
+  nodejs = pkgs.nodejs-10_x;
   mysql = pkgs.mysql57;
 
   secrets = (import ../secrets.nix).blog;

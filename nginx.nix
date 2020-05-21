@@ -2,21 +2,69 @@ let secrets = (import ./secrets.nix);
 in {
   networking.firewall.allowedTCPPorts = [ 80 443 ];
   services.nginx.enable = true;
+  security.acme = {
+    certs = {
+      "b123400.net" = {
+        webroot = "/var/www/challenges/b123400.net";
+        email = "i@b123400.net";
+      };
+      "blog.b123400.net" = {
+        webroot = "/var/www/challenges/blog.b123400.net";
+        email = "i@b123400.net";
+      };
+      "whosetweet.b123400.net" = {
+        webroot = "/var/www/challenges/whosetweet.b123400.net";
+        email = "i@b123400.net";
+      };
+      "todo.b123400.net" = {
+        webroot = "/var/www/challenges/todo.b123400.net";
+        email = "i@b123400.net";
+      };
+      "ferry.b123400.net" = {
+        webroot = "/var/www/challenges/ferry.b123400.net";
+        email = "i@b123400.net";
+      };
+      "krr.ee" = {
+        webroot = "/var/www/challenges/krr.ee";
+        email = "i@b123400.net";
+      };
+    };
+    acceptTerms = true;
+  };
   services.nginx.virtualHosts = {
     "b123400.net" = {
       forceSSL = true;
       enableACME = true;
+      acmeRoot = "/var/www/challenges/b123400.net";
       root = "/var/www/b123400.net";
-      sslCertificate = "/etc/letsencrypt/live/b123400.net/fullchain.pem";
-      sslCertificateKey = "/etc/letsencrypt/live/b123400.net/privkey.pem";
+    };
+
+    "krr.ee" = {
+      forceSSL = true;
+      enableACME = true;
+      root = "/var/www/krr.ee";
+      acmeRoot = "/var/www/challenges/krr.ee";
+      locations = {
+        "/nico" = {
+          extraConfig = ''
+            return 301 https://com.nicovideo.jp/community/co1729494;
+          '';
+        };
+        "/youtube" = {
+          extraConfig = ''
+            return 301 https://gaming.youtube.com/channel/UCb0FJKE6EFtPlwYHl1CNfWA;
+          '';
+        };
+        "/shop/" = {
+          proxyPass = "http://localhost:${secrets.krrForm.port}/";
+        };
+      };
     };
 
     "blog.b123400.net" = {
       enableACME = true;
-      onlySSL = true;
-      #enableSSL = true;
-      sslCertificate = "/etc/letsencrypt/live/b123400.net/fullchain.pem";
-      sslCertificateKey = "/etc/letsencrypt/live/b123400.net/privkey.pem";
+      forceSSL = true;
+      acmeRoot = "/var/www/challenges/blog.b123400.net";
       locations = {
         "/" = {
           proxyPass = "http://localhost:${secrets.blog.port}";
@@ -24,19 +72,18 @@ in {
             proxy_redirect off;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
+            proxy_set_header Host $host;
             proxy_set_header X-NginX-Proxy true;
             proxy_set_header X-Forwarded-Proto $scheme;
           '';
         };
       };
     };
+
     "whosetweet.b123400.net" = {
       enableACME = true;
-      onlySSL = true;
-      #enableSSL = true;
-      sslCertificate = "/etc/letsencrypt/live/b123400.net/fullchain.pem";
-      sslCertificateKey = "/etc/letsencrypt/live/b123400.net/privkey.pem";
+      forceSSL = true;
+      acmeRoot = "/var/www/challenges/whosetweet.b123400.net";
       locations = {
         "/" = {
           proxyPass = "http://localhost:${secrets.whosetweet.port}";
@@ -44,7 +91,45 @@ in {
             proxy_redirect off;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header Host $http_host;
+            proxy_set_header Host $host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+      };
+    };
+
+    "todo.b123400.net" = {
+      enableACME = true;
+      forceSSL = true;
+      acmeRoot = "/var/www/challenges/todo.b123400.net";
+      locations = {
+        "/" = {
+          proxyPass = "http://localhost:${secrets.todograph.port}";
+          extraConfig = ''
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+      };
+    };
+    
+    "ferry.b123400.net" = {
+      enableACME = true;
+      forceSSL = true;
+      acmeRoot = "/var/www/challenges/ferry.b123400.net";
+      locations = {
+        "/" = {
+          proxyPass = "http://localhost:${secrets.ferry.port}";
+          extraConfig = ''
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $host;
             proxy_set_header X-NginX-Proxy true;
             proxy_set_header X-Forwarded-Proto $scheme;
           '';

@@ -1,0 +1,21 @@
+{
+  "name": "todograph",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/b123400/todograph.git"
+  },
+  "author": "b123400",
+  "bugs": {
+    "url": "https://gitlab.com/b123400/todograph/issues"
+  },
+  "scripts": {
+    "stylus:build": "stylus ./index.styl -o ./css/index.css",
+    "stylus:watch": "stylus -w ./index.styl -o ./css/index.css"
+  },
+  "homepage": "https://gitlab.com/b123400/todograph#README",
+  "dependencies": {},
+  "devDependencies": {
+    "stylus": "^0.54.5"
+  }
+}
