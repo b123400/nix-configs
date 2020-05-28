@@ -76,30 +76,34 @@
   };
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
   networking.firewall = {
     enable = true;
     extraCommands = ''
-      iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+      iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
+      iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o enp0s4 -j MASQUERADE
+      ip6tables -A FORWARD -i wg0 -j ACCEPT
+      ip6tables -t nat -A POSTROUTING -o enp0s4 -j MASQUERADE
     '';
-    extraStopCommands = ''
-      iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
-    '';
-    allowedUDPPorts = [ 1194 ];
+
+    #extraStopCommands = ''
+      #iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
+      #ip6tables -D FORWARD -i wg0 -j ACCEPT
+      #ip6tables -t nat -D POSTROUTING -o enp0s4 -j MASQUERADE
+    #'';
+
+    allowedUDPPorts = [ 1194 51820 ];
     allowedTCPPorts = [ 9091 ];
     trustedInterfaces = [ "tun0" ];
   };
 
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.forwarding" = 1;
+    "net.ipv6.conf.default.forwarding" = 1;
   };
 
   networking.interfaces= {
-    eth0 = {
+    enp0s4 = {
       tempAddress = "disabled";
     };
     tun0 = {
@@ -133,13 +137,53 @@
     };
   };
 
-  #networking.nat = {
-  #  enable = true;
-  #  externalInterface = "eth0";
-  #  internalInterfaces = [ "wg0" ];
-  #};
+  networking.nat = {
+    enable = true;
+    externalInterface = "enp0s4";
+    internalInterfaces = [ "wg0" ];
+  };
 
-  #networking.usePredictableInterfaceNames = false;
+  networking.wireguard.interfaces = {
+    wg0 = {
+      # Determines the IP address and subnet of the server's end of the tunnel interface.
+      ips = [
+        "10.100.0.1/24"
+        "fd42:42:42::1/64"
+      ];
+
+      # The port that Wireguard listens to. Must be accessible by the client.
+      listenPort = 51820;
+
+      # Path to the private key file.
+      #
+      # Note: The private key can also be included inline via the privateKey option,
+      # but this makes the private key world-readable; thus, using privateKeyFile is
+      # recommended.
+      privateKeyFile = "/root/wireguard-keys/private";
+
+      peers = [
+        # List of allowed peers.
+        { # PowerMac G5
+          # Public key of the peer (not a file path).
+          publicKey = "BTasq/gZtgunDwO8ByexsCMutyEkxrsmQx6c+joOXXY=";
+          # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+          allowedIPs = [
+            "10.100.0.2/32"
+            "fd42:42:42::2/128"
+          ];
+        }
+        { # BK201
+          publicKey = "dpem6R3pxrdwdFo1SJhM5AI9TV66wyBrpfQIxNxj2TE=";
+          allowedIPs = [
+            "10.100.0.3/32"
+            "fd42:42:42::3/128"
+          ];
+        }
+      ];
+    };
+  };
+
+  networking.usePredictableInterfaceNames = true;
   networking.enableIPv6 = true;
 
   services.mysql = {
