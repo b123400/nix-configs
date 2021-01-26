@@ -110,7 +110,6 @@
   services.nginx.enable = true;
   services.nginx.statusPage = true;
 
-
   networking.nat = {
     enable = true;
     externalInterface = "enp0s4";
@@ -213,10 +212,12 @@
   services.mysql = {
     enable = true;
     package = pkgs.mysql;
-    extraOptions = ''
-      character-set-server    = utf8mb4
-      collation-server        = utf8mb4_general_ci
-    '';
+    settings = {
+      mysqld = {
+        character-set-server    = "utf8mb4";
+        collation-server        = "utf8mb4_general_ci";
+      };
+    };
   };
 
   services.neo4j = {
@@ -232,7 +233,7 @@
       settings = {
         rpc-enabled = true;
         rpc-whitelist-enabled = true;
-        rpc-whitelist = "10.8.*.*,127.0.0.1,192.168.*.*,139.162.15.81";
+        rpc-whitelist = "10.8.*.*,127.0.0.1,192.168.*.*";
         rpc-username = secrets.username;
         rpc-password = secrets.password;
       };
@@ -240,8 +241,7 @@
 
   services.longview = {
     enable = true;
-    apiKey = (import ./secrets.nix).longview.apiKey;
-    # TODO: use apiKeyFile
+    apiKeyFile = /home/b123400/longview_api_key;
 
     nginxStatusUrl = "http://localhost/nginx_status";
     # mysqlUser = "";
