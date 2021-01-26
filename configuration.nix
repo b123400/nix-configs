@@ -12,7 +12,6 @@
       ./nginx.nix
       ./blog/service.nix
       ./whosetweet/service.nix
-      ./krrForm/service.nix
       ./todograph/service.nix
       ./ferry-web/service.nix
     ];
@@ -81,19 +80,16 @@
     extraCommands = ''
       iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
       iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o enp0s4 -j MASQUERADE
-      ip6tables -A FORWARD -i wg0 -j ACCEPT
-      ip6tables -t nat -A POSTROUTING -o enp0s4 -j MASQUERADE
     '';
 
-    #extraStopCommands = ''
-      #iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
-      #ip6tables -D FORWARD -i wg0 -j ACCEPT
-      #ip6tables -t nat -D POSTROUTING -o enp0s4 -j MASQUERADE
-    #'';
+    extraStopCommands = ''
+      iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o enp0s4 -j MASQUERADE
+      iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o enp0s4 -j MASQUERADE
+    '';
 
     allowedUDPPorts = [ 1194 51820 ];
     allowedTCPPorts = [ 9091 ];
-    trustedInterfaces = [ "tun0" ];
+    trustedInterfaces = [ "tun0" "wg0" ];
   };
 
   boot.kernel.sysctl = {
@@ -114,28 +110,6 @@
   services.nginx.enable = true;
   services.nginx.statusPage = true;
 
-  services.openvpn = {
-    servers = {
-      nadeko = {
-        config = ''
-          dev tun0
-          # ifconfig 10.8.0.1 10.8.0.2
-          port 1194
-          comp-lzo
-          server 10.8.0.0 255.255.255.0
-
-          ca /root/openvpn/pki/ca.crt
-          cert /root/openvpn/pki/issued/Hanekawa.crt
-          key /root/openvpn/pki/private/Hanekawa.key
-          tls-auth /root/openvpn/ta.key
-          dh /root/openvpn/pki/dh.pem
-
-          push "redirect-gateway def1"
-          push "dhcp-option DNS 8.8.8.8"
-        '';
-      };
-    };
-  };
 
   networking.nat = {
     enable = true;
@@ -163,15 +137,6 @@
 
       peers = [
         # List of allowed peers.
-        { # PowerMac G5
-          # Public key of the peer (not a file path).
-          publicKey = "BTasq/gZtgunDwO8ByexsCMutyEkxrsmQx6c+joOXXY=";
-          # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-          allowedIPs = [
-            "10.100.0.2/32"
-            "fd42:42:42::2/128"
-          ];
-        }
         { # BK201
           publicKey = "dpem6R3pxrdwdFo1SJhM5AI9TV66wyBrpfQIxNxj2TE=";
           allowedIPs = [
@@ -179,7 +144,66 @@
             "fd42:42:42::3/128"
           ];
         }
+        { # Yoite
+          publicKey = "QeY/PNDTjrgJTuGmgbeeX3j6X/6Wa0q5hiNXzu7jz2w=";
+          allowedIPs = [
+            "10.100.0.4/32"
+            "fd42:42:42::4/128"
+          ];
+        }
+        { # PowerMac G5 2nd
+          publicKey = "pR3Wjdiai3OMkhM4WoXCSwYGh+UVyo5ZxqpcReMRGWk=";
+          allowedIPs = [
+            "10.100.0.5/32"
+            "fd42:42:42::5/128"
+          ];
+        }
+        { # Min
+          publicKey = "GMWM/NvFkFbqkZJsSCCNL4D9saELbaRGsVH41Yk4JQs=";
+          allowedIPs = [
+            "10.100.0.6/32"
+            "fd42:42:42::6/128"
+          ];
+        }
+        { # Heidi
+          publicKey = "buONH1J2bxIjAD+6YDbNpSOaEndWAyzZZ/SWZ0jloFs=";
+          allowedIPs = [
+            "10.100.0.7/32"
+            "fd42:42:42::7/128"
+          ];
+        }
       ];
+    };
+  };
+
+  #networking.nameservers = [ "::1" ];
+  #networking.resolvconf.enable = false;
+  #services.resolved.enable = false;
+  environment.etc."resolv.conf".enable = false;
+    # If using dhcpcd:
+  networking.dhcpcd.extraConfig = "nohook resolv.conf";
+    # If using NetworkManager:
+  networking.networkmanager.dns = "none";
+
+  services.dnscrypt-proxy2 = {
+    enable = true;
+    settings = {
+      ipv6_servers = true;
+      require_dnssec = true;
+
+      listen_addresses = [
+        #"127.0.0.1:53" 
+        #"10.100.0.1:53" 
+        #"[fd42:42:42::1]:53"
+        "0.0.0.0:53"
+      ];
+
+      static.NextDNS-26a8a1 = {
+        stamp = "sdns://...";
+      };
+
+      # You can choose a specific set of servers from https://github.com/DNSCrypt/dnscrypt-resolvers/blob/master/v2/public-resolvers.md
+      server_names = [ "..." ];
     };
   };
 

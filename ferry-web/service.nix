@@ -5,8 +5,8 @@ let pkgs = import <nixpkgs> {};
     dataDir = "/var/www/ferry-web";
     src = pkgs.fetchgit {
       url = "https://github.com/b123400/ferry-web.git";
-      rev = "6ef8b811f47defd9ed53ec80a68934c99ee1f34b";
-      sha256 = "1xxgnc7rb8mgilja2p07gcwxxlxw5h8wnknvc5fm0k3ilijj4zk3";
+      rev = "248be86d7d25931cf10452634ee0f2a6a48e8ca7";
+      sha256 = "0jz7wf1f7swfw2pz3aas6rh7plinvm0xmgclk06lqvyzjw8gnr5v";
     };
     secrets = import ../secrets.nix;
 in {

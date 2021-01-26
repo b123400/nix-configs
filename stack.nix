@@ -66,6 +66,7 @@
   depSrc,
   src,
   name,
+  keepDeps ? true,
 }:
 let deps = pkgs.stdenv.mkDerivation {
       name = "${name}-deps";
@@ -73,7 +74,6 @@ let deps = pkgs.stdenv.mkDerivation {
       src = depSrc;
       buildInputs = [ pkgs.stack pkgs.zlib ghc pkgs.gnugrep ];
       LANG = "en_US.UTF-8";
-      LC_ALL = "en_US.UTF-8";
 
       configurePhase = ''
         export HOME=$NIX_BUILD_TOP/fake-home
@@ -106,6 +106,7 @@ let deps = pkgs.stdenv.mkDerivation {
         mv .stack-work $out/.stack-work
       '';
     };
+    keepDepsCommand = if !keepDeps then "" else "ln -s ${deps} $out/deps";
 in
 pkgs.stdenv.mkDerivation {
   name = name;
@@ -113,7 +114,6 @@ pkgs.stdenv.mkDerivation {
   src = src;
   buildInputs = [ pkgs.stack pkgs.zlib ghc ];
   LANG = "en_US.UTF-8";
-  LC_ALL = "en_US.UTF-8";
 
   __noChroot = true;
   configurePhase = ''
@@ -141,6 +141,7 @@ pkgs.stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/bin
     stack --no-nix --local-bin-path=$out/bin build --copy-bins
+    ${keepDepsCommand}
   '';
 }
 

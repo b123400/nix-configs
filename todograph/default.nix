@@ -5,13 +5,10 @@
 }:
 let src = pkgs.fetchgit {
       url = "https://gitlab.com/b123400/todograph.git";
-      rev = "4a6d2173cdaafb861774173fe617ab8a78b6d41e";
-      sha256 = "04xcrs4ng202d9q97wk5p8ikncyqxjrffaq0ll1a2j150knmhj6m";
+      rev = "1980eec4797affe8be28170a4a9d319025b0f6a0";
+      sha256 = "14wf730g0jwh64m9q6lg2fqa1gv1y7wbs15va0f8pbqk9i8gkc3a";
     };
-    backend = import ./backend/default.nix { inherit pkgs system; };
-    #backend = (import ./backend/backend.nix { inherit pkgs; }).todograph.overrideAttrs( attrs : attrs // {
-    #  inherit src;
-    #});
+    backend = import ./backend/default.nix { inherit pkgs system src; };
     frontend = import ./frontend/default.nix { inherit src; };
     style = import ./style/default.nix { inherit src pkgs system nodejs; };
 in

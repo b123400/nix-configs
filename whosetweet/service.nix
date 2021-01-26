@@ -1,27 +1,11 @@
 let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
-  fetchgit = pkgs.fetchgit;
-  ghc = pkgs.haskell.compiler.ghc865;
-  makeWrapper = pkgs.makeWrapper;
-  
-  #stack = pkgs.stack;
-
-  nixpkgs-19-03-tarball = builtins.fetchTarball {
-    # Channel nixos-19.03 as of 2019/08/12.
-    url = "https://github.com/NixOS/nixpkgs/archive/56d94c8c69f8cac518027d191e2f8de678b56088.tar.gz";
-    sha256 = "1c812ssgmnmh97sarmp8jcykk0g57m8rsbfjg9ql9996ig6crsmi";
-  };
-
-  nixpkgs-19-03 = import nixpkgs-19-03-tarball {};
-
-  stack = nixpkgs-19-03.stack;
-
   rootDir = "/var/whosetweet";
   secrets = (import ../secrets.nix).whosetweet;
 
   rawWhosetweet = import ./whosetweet.nix {
-    inherit stdenv fetchgit makeWrapper stack ghc;
+    inherit pkgs;
   };
 
   whosetweet = stdenv.mkDerivation {

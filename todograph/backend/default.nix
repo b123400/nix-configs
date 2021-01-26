@@ -2,12 +2,12 @@
   pkgs ? import <nixpkgs> { inherit system; },
   system ? builtins.currentSystem,
   ghc ? pkgs.haskell.compiler.ghc883,
+  src,
 }:
-let src = depSrc;
-    depSrc = pkgs.fetchgit {
+let depSrc = pkgs.fetchgit {
       url = "https://gitlab.com/b123400/todograph.git";
-      rev = "d25e861559127ce83b37648a168a725772fc54df";
-      sha256 = "19lw4k5c1mrczjm1j82pdd9xqaw5i1128q6c4711d2k5xif3g6kb";
+      rev = "1980eec4797affe8be28170a4a9d319025b0f6a0"; 
+      sha256 = "14wf730g0jwh64m9q6lg2fqa1gv1y7wbs15va0f8pbqk9i8gkc3a";
     };
     stack = (import ../../stack.nix);
 in

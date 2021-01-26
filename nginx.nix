@@ -24,10 +24,6 @@ in {
         webroot = "/var/www/challenges/ferry.b123400.net";
         email = "i@b123400.net";
       };
-      "krr.ee" = {
-        webroot = "/var/www/challenges/krr.ee";
-        email = "i@b123400.net";
-      };
     };
     acceptTerms = true;
   };
@@ -37,28 +33,6 @@ in {
       enableACME = true;
       acmeRoot = "/var/www/challenges/b123400.net";
       root = "/var/www/b123400.net";
-    };
-
-    "krr.ee" = {
-      forceSSL = true;
-      enableACME = true;
-      root = "/var/www/krr.ee";
-      acmeRoot = "/var/www/challenges/krr.ee";
-      locations = {
-        "/nico" = {
-          extraConfig = ''
-            return 301 https://com.nicovideo.jp/community/co1729494;
-          '';
-        };
-        "/youtube" = {
-          extraConfig = ''
-            return 301 https://gaming.youtube.com/channel/UCb0FJKE6EFtPlwYHl1CNfWA;
-          '';
-        };
-        "/shop/" = {
-          proxyPass = "http://localhost:${secrets.krrForm.port}/";
-        };
-      };
     };
 
     "blog.b123400.net" = {

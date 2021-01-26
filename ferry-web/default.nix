@@ -7,8 +7,8 @@
 let 
     depSrc = pkgs.fetchgit {
       url = "https://github.com/b123400/ferry-web.git";
-      rev = "22fec2667d5682052671555b29a2f4a6ebf01d83";
-      sha256 = "1j75s9h2hc4ds6aqq6002hq0x6h08fr2j8f69w7gd4mh1796k1b3";
+      rev = "248be86d7d25931cf10452634ee0f2a6a48e8ca7";
+      sha256 = "0jz7wf1f7swfw2pz3aas6rh7plinvm0xmgclk06lqvyzjw8gnr5v";
     };
     stack = (import ../stack.nix);
 in
