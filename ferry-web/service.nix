@@ -5,8 +5,8 @@ let pkgs = import <nixpkgs> {};
     dataDir = "/var/www/ferry-web";
     src = pkgs.fetchgit {
       url = "https://github.com/b123400/ferry-web.git";
-      rev = "248be86d7d25931cf10452634ee0f2a6a48e8ca7";
-      sha256 = "0jz7wf1f7swfw2pz3aas6rh7plinvm0xmgclk06lqvyzjw8gnr5v";
+      rev = "ef6e6528f21d1a336f7b322a837cd4310d5cc495";
+      sha256 = "10vwd72a2bag17x5ri5rr998mb47hr9lnxqn7z8i33axj7b3jisk";
     };
     secrets = import ../secrets.nix;
 in {
@@ -29,6 +29,7 @@ in {
     group = "ferryweb";
     description = "ferryweb privilege separation user";
     createHome = false;
+    isSystemUser = true;
   };
   users.extraGroups.ferryweb.name = "ferryweb";
 }

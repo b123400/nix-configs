@@ -25,6 +25,7 @@ in {
     group = "todograph";
     description = "todograph privilege separation user";
     createHome = false;
+    isSystemUser = true;
   };
   users.extraGroups.todograph.name = "todograph";
 }

@@ -61,6 +61,7 @@ in {
     description = "Whosetweet privilege separation user";
     home = rootDir;
     createHome = true;
+    isSystemUser = true;
   };
   users.extraGroups.whosetweet.name = "whosetweet";
 }

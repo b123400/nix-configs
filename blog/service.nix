@@ -1,7 +1,7 @@
 let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
-  nodejs = pkgs.nodejs-10_x;
+  nodejs = pkgs.nodejs-14_x;
   mysql = pkgs.mysql57;
 
   secrets = (import ../secrets.nix).blog;
@@ -48,6 +48,7 @@ in {
     group = "ghost";
     description = "ghost privilege separation user";
     createHome = false;
+    isSystemUser = true;
   };
   users.extraGroups.ghost.name = "ghost";
 }

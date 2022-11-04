@@ -1,12 +1,12 @@
 { pkgs ? import <nixpkgs> { inherit system; },
   system ? builtins.currentSystem,
-  ghc ? pkgs.haskell.compiler.ghc883,
+  ghc ? pkgs.haskell.compiler.ghc884,
 }:
 
   let src = pkgs.fetchgit {
-    url = git://github.com/b123400/whosetweet;
-    rev = "df34c32fb94335e879169f936db26c137fb8dc34";
-    sha256 = "17xak98mf1y2dkc9bjwlcc794c0mrb7q54hy23101p40x3zr965w";
+    url = https://github.com/b123400/whosetweet.git;
+    rev = "07c0530fb6296a6e7ae0bb9172cd043234d155e4";
+    sha256 = "0iac98v7i3qj2i7j2d814iw33kfds55inkn6jp88qybkfpns2jq4";
   };
     depSrc = src;
     stack = (import ../stack.nix);

@@ -12,8 +12,12 @@
       ./nginx.nix
       ./blog/service.nix
       ./whosetweet/service.nix
-      ./todograph/service.nix
+#      ./todograph/service.nix
       ./ferry-web/service.nix
+      ./diary.nix
+      (import ./pleroma.nix {
+         # nixpkgs = nixpkgsWithPleroma;
+       })
     ];
 
   # Use the GRUB 2 boot loader.
@@ -38,6 +42,7 @@
   '';
 
   networking.hostName = "Hanekawa"; # Define your hostname.
+  networking.domain = "b123400.net";
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Select internationalisation properties.
@@ -136,8 +141,8 @@
 
       peers = [
         # List of allowed peers.
-        { # BK201
-          publicKey = "dpem6R3pxrdwdFo1SJhM5AI9TV66wyBrpfQIxNxj2TE=";
+        { # BK201, Abumizaka
+          publicKey = "gL8X0IGTkqDsjuaQf5pmvaTmYh6mpMF5q9VOr7/o8CU=";
           allowedIPs = [
             "10.100.0.3/32"
             "fd42:42:42::3/128"
@@ -150,8 +155,8 @@
             "fd42:42:42::4/128"
           ];
         }
-        { # PowerMac G5 2nd
-          publicKey = "pR3Wjdiai3OMkhM4WoXCSwYGh+UVyo5ZxqpcReMRGWk=";
+        { # Macbook Air 2012
+          publicKey = "q5lf+JhGvtbO9XphmM8P/DnD03urR1j39GLl7hHirDg=";
           allowedIPs = [
             "10.100.0.5/32"
             "fd42:42:42::5/128"
@@ -169,6 +174,20 @@
           allowedIPs = [
             "10.100.0.7/32"
             "fd42:42:42::7/128"
+          ];
+        }
+        { # KC
+          publicKey = "JwqCoyeRcYphiGMjzb5qVQJl7YHgsku+owfjUIPQni0=";
+          allowedIPs = [
+            "10.100.0.8/32"
+            "fd42:42:42::8/128"
+          ];
+        }
+        { # M1
+          publicKey = "l4NPQRf3K/NYXJhvrDJiBPOgUS3bJH8KUn3tmJkmQU8=";
+          allowedIPs = [
+            "10.100.0.9/32"
+            "fd42:42:42::9/128"
           ];
         }
       ];
@@ -221,7 +240,7 @@
   };
 
   services.neo4j = {
-    enable = true;
+    enable = false;
     shell.enable = true;
     bolt.enable = true;
   };
@@ -231,13 +250,22 @@
     in {
       enable = true;
       settings = {
+        rpc-bind-address = "10.100.0.1";
         rpc-enabled = true;
         rpc-whitelist-enabled = true;
-        rpc-whitelist = "10.8.*.*,127.0.0.1,192.168.*.*";
+        rpc-whitelist = "10.8.*.*,10.100.*.*,,10.100.0.1,127.0.0.1,192.168.*.*";
         rpc-username = secrets.username;
         rpc-password = secrets.password;
       };
     };
+
+  services.matomo = {
+    enable = true;
+    # periodicArchiveProcessingUrl = "matomo.b123400.net";
+    nginx = {
+      serverName = "matomo.b123400.net"; 
+    };
+  };
 
   services.longview = {
     enable = true;
