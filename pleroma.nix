@@ -30,12 +30,21 @@
       config :pleroma, configurable_from_database: false
       config :pleroma, :shout, enabled: false
 
+      config :pleroma, Pleroma.Upload,
+        filters: [Pleroma.Upload.Filter.Exiftool.StripLocation]
+
       config :pleroma, :frontend_configurations,
         pleroma_fe: %{
           theme: "is-he.re-brown",
           background: "/images/background.jpg",
           disableChat: true
         }
+
+      config :web_push_encryption, :vapid_details,
+        subject: "i@b123400.net",
+        public_key: "/etc/pleroma/vapid_public.pem",
+        private_key: "/etc/pleroma/vapid_private.pem"
+
     ''
     ];
     secretConfigFile = "/etc/pleroma/secret.exs";
@@ -44,6 +53,7 @@
 
   systemd.services.pleroma.serviceConfig.RuntimeMaxSec = "3600s";
   systemd.services.pleroma.serviceConfig.Restart = "always";
+  systemd.services.pleroma.path = [ nixpkgs.bash nixpkgs.exiftool ];
 
   services.postgresql = {
     enable = true;

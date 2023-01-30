@@ -4,6 +4,13 @@
 
 { config, pkgs, ... }:
 
+let 
+  nixpkgsWithPleromaTar = builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/b21240601d07108a391e5767c6d1d3b47bd7ff6f.tar.gz";
+    sha256 = "0wl8myasw1day33cz1kci4k53q5xsxd8n76w9gi5yxmb8c8jkmmj";
+  };
+    nixpkgsWithPleroma = import nixpkgsWithPleromaTar { };
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -16,7 +23,7 @@
       ./ferry-web/service.nix
       ./diary.nix
       (import ./pleroma.nix {
-         # nixpkgs = nixpkgsWithPleroma;
+         nixpkgs = nixpkgsWithPleroma;
        })
     ];
 
