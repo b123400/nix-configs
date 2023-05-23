@@ -1,4 +1,6 @@
 { nixpkgs ? import <nixpkgs> {} }:
+let secrets = import ./secrets.nix;
+in
 {
   services.pleroma = {
     enable = true;
@@ -8,7 +10,7 @@
 
       config :pleroma, Pleroma.Web.Endpoint,
       url: [host: "is-he.re", scheme: "https", port: 443],
-      http: [ip: {127, 0, 0, 1}, port: 4000]
+      http: [ip: {127, 0, 0, 1}, port: ${secrets.pleroma.port}]
 
       config :pleroma, :instance,
       name: "Is Here",

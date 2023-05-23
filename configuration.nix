@@ -17,16 +17,13 @@ in
       ./hardware-configuration.nix
       ./b123400.nix
       ./nginx.nix
-      ./blog/service.nix
-      ./whosetweet/service.nix
-#      ./todograph/service.nix
-      ./ferry-web/service.nix
+      ./website.nix
       ./diary.nix
       (import ./pleroma.nix {
          nixpkgs = nixpkgsWithPleroma;
        })
     ];
-
+  
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
@@ -235,23 +232,6 @@ in
   networking.usePredictableInterfaceNames = true;
   networking.enableIPv6 = true;
 
-  services.mysql = {
-    enable = true;
-    package = pkgs.mysql;
-    settings = {
-      mysqld = {
-        character-set-server    = "utf8mb4";
-        collation-server        = "utf8mb4_general_ci";
-      };
-    };
-  };
-
-  services.neo4j = {
-    enable = false;
-    shell.enable = true;
-    bolt.enable = true;
-  };
-
   services.transmission =
     let secrets = (import ./secrets.nix).transmission;
     in {
@@ -265,14 +245,6 @@ in
         rpc-password = secrets.password;
       };
     };
-
-  services.matomo = {
-    enable = true;
-    # periodicArchiveProcessingUrl = "matomo.b123400.net";
-    nginx = {
-      serverName = "matomo.b123400.net"; 
-    };
-  };
 
   services.longview = {
     enable = true;

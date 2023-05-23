@@ -1,18 +1,5 @@
-let pkgs = import <nixpkgs> {};
-    secrets = import ./secrets.nix;
-    mdblog = pkgs.rustPlatform.buildRustPackage rec {
-      pname = "mdblog";
-      version = "0.1.0";
-
-      src = pkgs.fetchgit {
-        url = "https://git.sr.ht/~not/mdblog";
-        rev = "1f9745afe97b8e294ee637e7ec194dd33f7d556f";
-        sha256 = "sha256-TUCcluHhCwz6NDotb26GkuSo+mTNtqw7dPgpe1jg6Ds=";
-      };
-
-      cargoSha256 = "0c6rsrd6bk5gwr4jkb3garplkd9rqhnlrql7ir0hgm74w5224qb4";
-    };
-
+let secrets = import ./secrets.nix;
+    mdblog = import ./mdblog.nix;
 in {
   systemd.services.diary = {
     wantedBy = [ "multi-user.target" ];
