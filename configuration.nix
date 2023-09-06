@@ -26,7 +26,6 @@ in
   
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.version = 2;
   # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
@@ -36,7 +35,7 @@ in
   boot.loader.grub.forceInstall = true;
   boot.loader.grub.device = "nodev";
   boot.loader.timeout = 10;
-  boot.cleanTmpDir = true;
+  boot.tmp.cleanOnBoot = true;
 
   boot.kernelParams = ["console=ttyS0,19200n8"];
   boot.loader.grub.extraConfig = ''
@@ -80,7 +79,7 @@ in
 
   services.openssh = {
     enable = true;
-    permitRootLogin = "no";
+    settings.PermitRootLogin = "no";
   };
 
   # Open ports in the firewall.
