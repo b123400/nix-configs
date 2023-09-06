@@ -26,6 +26,9 @@ in {
       acmeRoot = "/var/www/challenges/b123400.net";
       #root = "/var/www/b123400.net";
       locations = {
+        "/xliffie/glosseries" = {
+          return = "301 https://b123400.net/xliffie/glossary";
+        };
         "/" = {
           proxyPass = "http://127.0.0.1:${secrets.website.port}";
           extraConfig = ''
@@ -35,10 +38,24 @@ in {
       };
     };
 
-    "curio-sity.net" = {
-      root = "/var/www/curio-sity.net";
+    "carlife.b123400.net" = {
+      forceSSL = true;
+      enableACME = true;
+      acmeRoot = "/var/www/challenges/carlife.b123400.net";
+      locations = {
+        "/" = {
+          proxyPass = "http://127.0.0.1:${secrets.carlife.port}";
+          extraConfig = ''
+            proxy_redirect off;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+          '';
+        };
+      };
     };
-    "www.curio-sity.net" = {
+
+    "curio-sity.net" = {
       root = "/var/www/curio-sity.net";
     };
 

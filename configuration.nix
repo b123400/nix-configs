@@ -19,6 +19,7 @@ in
       ./nginx.nix
       ./website.nix
       ./diary.nix
+      ./carlife/service.nix
       (import ./pleroma.nix {
          nixpkgs = nixpkgsWithPleroma;
        })
