@@ -1,5 +1,12 @@
 { nixpkgs ? import <nixpkgs> {} }:
 let secrets = import ./secrets.nix;
+    myPleroma = nixpkgs.pleroma.overrideAttrs (old: {
+      src = fetchGit {
+        url = "https://git.sr.ht/~not/Pleroma";
+        rev = "1d574852f4d334ba10d7a775dafd5d7758f41abe";
+        allRefs = true;
+      };
+    });
 in
 {
   services.pleroma = {
@@ -50,7 +57,7 @@ in
     ''
     ];
     secretConfigFile = "/etc/pleroma/secret.exs";
-    package = nixpkgs.pleroma-otp;
+    package = myPleroma;
   };
 
   systemd.services.pleroma.serviceConfig.RuntimeMaxSec = "3600s";
