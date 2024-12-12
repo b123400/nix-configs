@@ -9,7 +9,7 @@ let
 
   src = fetchGit {
     url = "https://git.sr.ht/~not/carlife";
-    rev = "f2b38c4383d4e137c660a8c05c04c07fa5b9eb22";
+    rev = "9ff62822e91bf27dbf20cf6ac884417e2b751350";
   };
 
   # if using mix2nix you can use the mixNixDeps attribute

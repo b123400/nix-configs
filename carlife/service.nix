@@ -23,6 +23,7 @@ in {
       '';
       User = "carlife";
     };
+    path = [ nixpkgs.bash nixpkgs.exiftool ];
   };
   users.extraUsers.carlife = {
     group = "carlife";
