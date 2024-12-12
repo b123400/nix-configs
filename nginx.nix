@@ -29,6 +29,15 @@ in {
         "/xliffie/glosseries" = {
           return = "301 https://b123400.net/xliffie/glossary";
         };
+        "/tootrain/qt-static.zip" = {
+          proxyPass = "http://127.0.0.1:${secrets.website.port}";
+          extraConfig = ''
+            proxy_redirect off;
+          '';
+          basicAuth = {
+            "tootrain-qt-github" = "${secrets.tootrain-qt-github.password}";
+          };
+        };
         "/" = {
           proxyPass = "http://127.0.0.1:${secrets.website.port}";
           extraConfig = ''
